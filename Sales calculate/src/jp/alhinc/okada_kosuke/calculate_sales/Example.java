@@ -1,4 +1,4 @@
-package jp.co.alh.nc.okada_kosuke.calculate_sales;
+package jp.alhinc.okada_kosuke.calculate_sales;
 
 import java.io.BufferedReader;
 import java.io.BufferedWriter;
@@ -47,7 +47,7 @@ public class Example {
 			String s;
 
 			while((s= branchbuffer.readLine())!=null){
-				System.out.println(s+"を読み込みました");
+				//System.out.println(s+"を読み込みました");
 				String[] data = s.split(",");
 
 				if(!data[0].matches("^[0-9]{3}$")){
@@ -64,12 +64,12 @@ public class Example {
 			return;
 		}finally{
 			if(branchbuffer !=null){
-			try{
-				branchbuffer.close();
-			}catch(IOException e){
-				System.out.println(error);
-				return;
-			}
+				try{
+					branchbuffer.close();
+				}catch(IOException e){
+					System.out.println(error);
+					return;
+				}
 			}
 		}
 
@@ -88,7 +88,7 @@ public class Example {
 			String s;
 
 			while((s=commonditybuffer.readLine())!=null){
-				System.out.println(s+"を読み込みました");
+				//System.out.println(s+"を読み込みました");
 				String[] data = s.split(",");
 
 
@@ -106,12 +106,12 @@ public class Example {
 			return;
 		}finally{
 			if(commonditybuffer !=null){
-			try{
-				commonditybuffer.close();
-			}catch(IOException e){
-				System.out.println(error);
-				return;
-			}
+				try{
+					commonditybuffer.close();
+				}catch(IOException e){
+					System.out.println(error);
+					return;
+				}
 			}
 		}
 
@@ -138,17 +138,16 @@ public class Example {
 
 		//集計部門
 		try{
-
 			for(int i=0; i < rcdlist1.size();i++){
 				File file = new File (args[0], rcdlist1.get(i));//ファイル
 				ArrayList<String> rcdRead = new ArrayList<String>();
-			//	System.out.println(args[0] + "\\" + rcdlist1.get(i));
+				//		System.out.println(args[0] + "\\" + rcdlist1.get(i));
 				br = new BufferedReader(new FileReader(file));//バッファードリーダー
 				String s;
 				while((s=br.readLine())!=null){//一行ずつ読み込む
 					rcdRead.add(s);
 				}
-				System.out.println(rcdRead);
+				//	System.out.println(rcdRead);
 				if (rcdRead.size()>3){
 					System.out.println(file.getName()+"のフォーマットが不正です");
 					return;
@@ -166,7 +165,7 @@ public class Example {
 
 
 				branchSaleMap.put(rcdRead.get(0), Long.parseLong(rcdRead.get(2)) + branchSaleMap.get(rcdRead.get(0)));
-		           //mapにrcdRead(arrayのやつ)の支店コードを入れる(rcdRead)に支店コードが対応、それに伴うrcdReadの売上+rcdReadの支店コードに対応する売上
+				//mapにrcdRead(arrayのやつ)の支店コードを入れる(rcdRead)に支店コードが対応、それに伴うrcdReadの売上+rcdReadの支店コードに対応する売上
 				commonSaleMap.put(rcdRead.get(1), Long.parseLong(rcdRead.get(2)) + commonSaleMap.get(rcdRead.get(1)));
 
 
@@ -184,46 +183,37 @@ public class Example {
 			return;
 		}finally{
 			if(br !=null){
-			try{
-				br.close();
-			}catch(IOException e){
-				System.out.println(error);
-				return;
-			}
+				try{
+					br.close();
+				}catch(IOException e){
+					System.out.println(error);
+					return;
+				}
 			}
 		}
 
 
 
 
-			System.out.println(branchSaleMap);
+		//System.out.println(branchSaleMap);
 
-			//ソート部門
+		//ソート部門
 		try{
-
-
-
 			List<Map.Entry<String,Long>> entries =
-			              new ArrayList<Map.Entry<String,Long>>(branchSaleMap.entrySet());
+					new ArrayList<Map.Entry<String,Long>>(branchSaleMap.entrySet());
 			Collections.sort(entries, new Comparator<Map.Entry<String,Long>>() {
 				public int compare(
 						Entry<String,Long> entry1, Entry<String,Long> entry2) {
 					return ((Long)entry2.getValue()).compareTo((Long)entry1.getValue());
 				}
-
-
-	      });
+			});
 			File file2 = new File (args[0], "\\branch.out");
 			bw = new BufferedWriter(new FileWriter(file2));
 			for (Entry<String,Long> s : entries) {
-
-
 				bw.write(s.getKey() + "," + branchNameMap.get(s.getKey())+"," + s.getValue()+System.getProperty("line.separator"));
-
-				System.out.println("s.getKey() : " + s.getKey());
-	            System.out.println("s.getValue() : " + s.getValue());
-
-		        }
+				//System.out.println("s.getKey() : " + s.getKey());
+				//System.out.println("s.getValue() : " + s.getValue());
+			}
 
 
 		}catch(IOException e){
@@ -231,18 +221,18 @@ public class Example {
 			return;
 		}finally{
 			if(bw !=null){
-			try{bw.close();
-			}catch(IOException e){
-				System.out.println(error);
-				return;
-			}
+				try{bw.close();
+				}catch(IOException e){
+					System.out.println(error);
+					return;
+				}
 			}
 		}
 
 
 		try{
 			List<Map.Entry<String,Long>> entries2 =
-		              new ArrayList<Map.Entry<String,Long>>(commonSaleMap.entrySet());
+					new ArrayList<Map.Entry<String,Long>>(commonSaleMap.entrySet());
 			Collections.sort(entries2, new Comparator<Map.Entry<String,Long>>() {
 				public int compare(
 						Entry<String,Long> entry1, Entry<String,Long> entry2) {
@@ -254,8 +244,8 @@ public class Example {
 			for (Entry<String,Long>s:entries2) {
 
 				bw2.write(s.getKey() + "," + commonNameMap.get(s.getKey()) + "," + s.getValue() + System.getProperty("line.separator"));
-					System.out.println("s.getKey() : " + s.getKey());
-					System.out.println("s.getValue() : " + s.getValue());
+				//System.out.println("s.getKey() : " + s.getKey());
+				//System.out.println("s.getValue() : " + s.getValue());
 			}
 
 		}catch(IOException e){
@@ -263,11 +253,11 @@ public class Example {
 			return;
 		}finally{
 			if(bw2 !=null){
-			try{bw2.close();
-			}catch(IOException e){
-				System.out.println(error);
-				return;
-			}
+				try{bw2.close();
+				}catch(IOException e){
+					System.out.println(error);
+					return;
+				}
 			}
 		}
 	}
