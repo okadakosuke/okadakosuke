@@ -15,7 +15,7 @@ import java.util.Map;
 import java.util.Map.Entry;
 
 public class Sales {
-	
+
 	public static void main(String[] args) {
 
 		String error="予期せぬエラーが発生しました";
@@ -23,9 +23,9 @@ public class Sales {
 			System.out.println(error);
 			return;
 		}
-		
+
 		File branchfile = new File (args[0],  File.separator + "branch.lst" );
-		File commodityfile = new File (args[0], File.separator + "commondity.lst" );
+		File commodityfile = new File (args[0], File.separator + "commodity.lst" );
 		File rcdfile = new File (args[0]);
 
 		HashMap<String, String>branchNameMap = new HashMap<String,String>();
@@ -37,8 +37,8 @@ public class Sales {
 		BufferedReader commoditybuffer = null;
 
 
-		
-		
+
+
 
 		if (!branchfile.exists() || !branchfile.canRead() ){
 			System.out.println("支店定義ファイルが存在しません");
@@ -112,17 +112,20 @@ public class Sales {
 			}
 		}
 
-		String[] filelist = rcdfile.list();
 
+		//String[] filelist = rcdfile.list();
+		File[] filecheck = rcdfile.listFiles();
 		ArrayList <Integer> rcdlist = new ArrayList <Integer>();
 		ArrayList <String> rcdlist1 = new ArrayList <String>();
-		for(int i=0;i <filelist.length; i++){
-			if(filelist[i].matches("^[0-9]{8}.rcd$")){
-				String[] rcddata = filelist[i].split( "\\.");
+		for(int i=0;i <filecheck.length; i++){
+			if(filecheck[i].getName().matches("^[0-9]{8}.rcd$") && filecheck[i].isFile() ){
+				String[] rcddata = filecheck[i].getName().split( "\\.");
 				rcdlist.add(Integer.valueOf(rcddata[0]) );
-				rcdlist1.add(filelist[i]);
+				rcdlist1.add(filecheck[i].getName());
 			}
 		}
+
+
 		if(rcdlist.size() != rcdlist.get(rcdlist.size()-1) - rcdlist.get(0) + 1){
 			System.out.println("売上ファイル名が連番になっていません");
 			return;
@@ -143,15 +146,16 @@ public class Sales {
 					rcdRead.add(s);
 				}
 
+				if (rcdRead.size() !=3){
+					System.out.println(file.getName() + "のフォーマットが不正です");
+					return;
+				}
+
 				if (!rcdRead.get(2).matches("^[0-9]*$")) {
 					System.out.println(error);
 					return;
 				}
 				//	System.out.println(rcdRead);
-				if (rcdRead.size() >3){
-					System.out.println(file.getName() + "のフォーマットが不正です");
-					return;
-				}
 
 				if (! branchSaleMap.containsKey (rcdRead.get(0)) ){
 					System.out.println(file.getName() + "の支店コードが不正です");
@@ -229,7 +233,7 @@ public class Sales {
 					return ((Long)entry2.getValue() ).compareTo((Long)entry1.getValue() );
 				}
 			});
-			File file3 = new File (args[0], File.separator + "commondity.out");
+			File file3 = new File (args[0], File.separator + "commodity.out");
 			bw2 = new BufferedWriter ( new FileWriter(file3) );
 			for (Entry <String,Long> s:entries2) {
 
