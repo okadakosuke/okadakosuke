@@ -17,27 +17,27 @@ import java.util.Map.Entry;
 public class Example {
 	public static void main(String[] args) {
 
-		File branchfile = new File(args[0], "\\branch.lst");//支店コードファイル
-		File commondityfile = new File(args[0],"\\commondity.lst");//商品コードファイル
-		File rcdfile = new File(args[0]);//売上ファイル
+		File branchfile = new File (args[0],  File.separator + "branch.lst" );//支店コードファイル
+		File commondityfile = new File (args[0], File.separator + "commondity.lst" );//商品コードファイル
+		File rcdfile = new File (args[0]);//売上ファイル
 
 		HashMap<String, String>branchNameMap = new HashMap<String,String>();//支店コードのsplit
 		HashMap<String,String>commonNameMap = new HashMap<String,String>();//商品コードのsplit
 		HashMap<String,Long> branchSaleMap = new HashMap<String,Long>();//支店コードの売上の箱
 		HashMap<String,Long> commonSaleMap = new HashMap<String,Long>();//商品コードの売上の箱
 
-
 		BufferedReader branchbuffer = null;//支店コードの読み取り
 		BufferedReader commonditybuffer = null;//商品コードの読み取り
 
 
 		String error="予期せぬエラーが発生しました";
+
 		if(args.length !=1){
 			System.out.println(error);
 			return;
 		}
 
-		if (!branchfile.exists() || !branchfile.canRead()){
+		if (!branchfile.exists() || !branchfile.canRead() ){
 			System.out.println("支店定義ファイルが存在しません");
 			return;
 		}
@@ -46,17 +46,16 @@ public class Example {
 
 			String s;
 
-			while((s= branchbuffer.readLine())!=null){
+			while( (s= branchbuffer.readLine() ) !=null){
 				//System.out.println(s+"を読み込みました");
 				String[] data = s.split(",");
 
-				if(!data[0].matches("^[0-9]{3}$")){
+				if(!data[0].matches("^[0-9]{3}$") ){
 					System.out.println("支店定義ファイルのフォーマットが不正です");
 					return;
 				}
 				branchNameMap.put(data[0], data[1]);
 				branchSaleMap.put(data[0], 0L);
-
 
 			}
 		}catch(IOException e){
@@ -73,17 +72,12 @@ public class Example {
 			}
 		}
 
-
-
-
-
-		if (!commondityfile.exists() || !commondityfile.canRead()){
+		if (!commondityfile.exists() || !commondityfile.canRead() ){
 			System.out.println("商品定義ファイルが存在しません");
 			return;
 		}
 		try{
 			commonditybuffer = new BufferedReader(new FileReader(commondityfile));
-
 
 			String s;
 
@@ -92,12 +86,12 @@ public class Example {
 				String[] data = s.split(",");
 
 
-				if(!data[0].matches("\\w{8}")){
+				if(!data[0].matches( File.separator + "w{8}") ){
 					System.out.println("商品定義ファイルのフォーマットが不正です");
 					return;
 				}
 				commonNameMap.put(data[0], data[1]);
-				commonSaleMap.put(data[0], 0l);
+				commonSaleMap.put(data[0], 0L);
 
 			}
 
@@ -117,12 +111,12 @@ public class Example {
 
 		String[] filelist = rcdfile.list();
 
-		ArrayList<Integer> rcdlist = new ArrayList<Integer>();
-		ArrayList<String> rcdlist1 = new ArrayList<String>();
-		for(int i=0;i<filelist.length;i++){
+		ArrayList <Integer> rcdlist = new ArrayList <Integer>();
+		ArrayList <String> rcdlist1 = new ArrayList <String>();
+		for(int i=0;i <filelist.length; i++){
 			if(filelist[i].matches("^[0-9]{8}.rcd$")){
-				String[] rcddata = filelist[i].split("\\.");
-				rcdlist.add(Integer.valueOf(rcddata[0]));
+				String[] rcddata = filelist[i].split( File.separator + ".");
+				rcdlist.add(Integer.valueOf(rcddata[0]) );
 				rcdlist1.add(filelist[i]);
 			}
 		}
@@ -131,51 +125,46 @@ public class Example {
 			return;
 		}
 
-
 		BufferedReader br = null;
 		BufferedWriter bw = null;
 		BufferedWriter bw2 = null;
 
 		//集計部門
 		try{
-			for(int i=0; i < rcdlist1.size();i++){
-				File file = new File (args[0], rcdlist1.get(i));//ファイル
-				ArrayList<String> rcdRead = new ArrayList<String>();
+			for(int i=0; i < rcdlist1.size(); i++){
+				File file = new File (args[0], rcdlist1.get(i) );//ファイル
+				ArrayList <String> rcdRead = new ArrayList <String>();
 				//		System.out.println(args[0] + "\\" + rcdlist1.get(i));
-				br = new BufferedReader(new FileReader(file));//バッファードリーダー
+				br = new BufferedReader(new FileReader (file) );//バッファードリーダー
 				String s;
-				while((s=br.readLine())!=null){//一行ずつ読み込む
+				while( (s=br.readLine() )!=null){//一行ずつ読み込む
 					rcdRead.add(s);
 				}
 				//	System.out.println(rcdRead);
-				if (rcdRead.size()>3){
-					System.out.println(file.getName()+"のフォーマットが不正です");
+				if (rcdRead.size() >3){
+					System.out.println(file.getName() + "のフォーマットが不正です");
 					return;
 				}
 
-				if (! branchSaleMap.containsKey(rcdRead.get(0))){
-					System.out.println(file.getName()+"の支店コードが不正です");
+				if (! branchSaleMap.containsKey (rcdRead.get(0)) ){
+					System.out.println(file.getName() + "の支店コードが不正です");
 					return;
 				}
-				if (! commonSaleMap.containsKey(rcdRead.get(1))){
-					System.out.println(file.getName()+"商品コードが不正です");
+				if (! commonSaleMap.containsKey(rcdRead.get(1)) ){
+					System.out.println(file.getName() + "商品コードが不正です");
 					return;
 				}
 
-
-
-				branchSaleMap.put(rcdRead.get(0), Long.parseLong(rcdRead.get(2)) + branchSaleMap.get(rcdRead.get(0)));
+				branchSaleMap.put(rcdRead.get(0), Long.parseLong(rcdRead.get(2)) + branchSaleMap.get(rcdRead.get(0)) );
 				//mapにrcdRead(arrayのやつ)の支店コードを入れる(rcdRead)に支店コードが対応、それに伴うrcdReadの売上+rcdReadの支店コードに対応する売上
-				commonSaleMap.put(rcdRead.get(1), Long.parseLong(rcdRead.get(2)) + commonSaleMap.get(rcdRead.get(1)));
+				commonSaleMap.put(rcdRead.get(1), Long.parseLong(rcdRead.get(2)) + commonSaleMap.get(rcdRead.get(1)) );
 
-
-				int branchDigit = String.valueOf(branchSaleMap.get(rcdRead.get(0))).length();
-				int commonDigit = String.valueOf(commonSaleMap.get(rcdRead.get(1))).length();
+				int branchDigit = String.valueOf(branchSaleMap.get(rcdRead.get(0)) ).length();
+				int commonDigit = String.valueOf(commonSaleMap.get(rcdRead.get(1)) ).length();
 				if(branchDigit > 10 || commonDigit > 10){
 					System.out.println("合計金額が10桁を超えました");
 					return;
 				}
-
 			}
 
 		}catch(IOException e){
@@ -191,30 +180,25 @@ public class Example {
 				}
 			}
 		}
-
-
-
-
 		//System.out.println(branchSaleMap);
 
 		//ソート部門
 		try{
-			List<Map.Entry<String,Long>> entries =
-					new ArrayList<Map.Entry<String,Long>>(branchSaleMap.entrySet());
-			Collections.sort(entries, new Comparator<Map.Entry<String,Long>>() {
+			List<Map.Entry <String,Long> > entries =
+					new ArrayList <Map.Entry <String,Long> > (branchSaleMap.entrySet() );
+			Collections.sort(entries, new Comparator<Map.Entry <String,Long> >() {
 				public int compare(
-						Entry<String,Long> entry1, Entry<String,Long> entry2) {
-					return ((Long)entry2.getValue()).compareTo((Long)entry1.getValue());
+						Entry <String,Long> entry1, Entry <String,Long> entry2) {
+					return ((Long)entry2.getValue() ).compareTo((Long)entry1.getValue() );
 				}
 			});
-			File file2 = new File (args[0], "\\branch.out");
-			bw = new BufferedWriter(new FileWriter(file2));
-			for (Entry<String,Long> s : entries) {
-				bw.write(s.getKey() + "," + branchNameMap.get(s.getKey())+"," + s.getValue()+System.getProperty("line.separator"));
+			File file2 = new File (args[0],  File.separator + "branch.out");
+			bw = new BufferedWriter(new FileWriter(file2) );
+			for (Entry <String,Long> s : entries) {
+				bw.write(s.getKey() + "," + branchNameMap.get(s.getKey() ) + "," + s.getValue() + System.getProperty("line.separator") );
 				//System.out.println("s.getKey() : " + s.getKey());
 				//System.out.println("s.getValue() : " + s.getValue());
 			}
-
 
 		}catch(IOException e){
 			System.out.println(error);
@@ -229,21 +213,20 @@ public class Example {
 			}
 		}
 
-
 		try{
-			List<Map.Entry<String,Long>> entries2 =
-					new ArrayList<Map.Entry<String,Long>>(commonSaleMap.entrySet());
-			Collections.sort(entries2, new Comparator<Map.Entry<String,Long>>() {
+			List <Map.Entry <String,Long> > entries2 =
+					new ArrayList <Map.Entry <String,Long> > (commonSaleMap.entrySet() );
+			Collections.sort(entries2, new Comparator<Map.Entry <String,Long> > () {
 				public int compare(
-						Entry<String,Long> entry1, Entry<String,Long> entry2) {
-					return ((Long)entry2.getValue()).compareTo((Long)entry1.getValue());
+						Entry <String,Long> entry1, Entry <String,Long> entry2) {
+					return ((Long)entry2.getValue() ).compareTo((Long)entry1.getValue() );
 				}
 			});
-			File file3 = new File (args[0],"\\commondity.out");
-			bw2 = new BufferedWriter ( new FileWriter(file3));
-			for (Entry<String,Long>s:entries2) {
+			File file3 = new File (args[0], File.separator + "commondity.out");
+			bw2 = new BufferedWriter ( new FileWriter(file3) );
+			for (Entry <String,Long> s:entries2) {
 
-				bw2.write(s.getKey() + "," + commonNameMap.get(s.getKey()) + "," + s.getValue() + System.getProperty("line.separator"));
+				bw2.write(s.getKey() + "," + commonNameMap.get(s.getKey() ) + "," + s.getValue() + System.getProperty("line.separator") );
 				//System.out.println("s.getKey() : " + s.getKey());
 				//System.out.println("s.getValue() : " + s.getValue());
 			}
