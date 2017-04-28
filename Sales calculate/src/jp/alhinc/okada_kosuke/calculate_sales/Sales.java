@@ -15,8 +15,15 @@ import java.util.Map;
 import java.util.Map.Entry;
 
 public class Sales {
+	
 	public static void main(String[] args) {
 
+		String error="予期せぬエラーが発生しました";
+		if(args.length !=1){
+			System.out.println(error);
+			return;
+		}
+		
 		File branchfile = new File (args[0],  File.separator + "branch.lst" );
 		File commodityfile = new File (args[0], File.separator + "commondity.lst" );
 		File rcdfile = new File (args[0]);
@@ -30,12 +37,8 @@ public class Sales {
 		BufferedReader commoditybuffer = null;
 
 
-		String error="予期せぬエラーが発生しました";
-
-		if(args.length >= 2){
-			System.out.println(error);
-			return;
-		}
+		
+		
 
 		if (!branchfile.exists() || !branchfile.canRead() ){
 			System.out.println("支店定義ファイルが存在しません");
@@ -93,7 +96,6 @@ public class Sales {
 				}
 				commoNameMap.put(data[0], data[1]);
 				commoSaleMap.put(data[0], 0L);
-
 			}
 
 		}catch(IOException e){
