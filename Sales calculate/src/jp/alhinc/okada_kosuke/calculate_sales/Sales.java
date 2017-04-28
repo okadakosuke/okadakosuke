@@ -23,10 +23,12 @@ public class Sales {
 			System.out.println(error);
 			return;
 		}
-
+		
 		File branchfile = new File (args[0],  File.separator + "branch.lst" );
 		File commodityfile = new File (args[0], File.separator + "commodity.lst" );
 		File rcdfile = new File (args[0]);
+		File file2 = new File (args[0],  File.separator + "branch.out");
+		File file3 = new File (args[0], File.separator + "commodity.out");
 
 		HashMap<String, String>branchNameMap = new HashMap<String,String>();
 		HashMap<String,String>commoNameMap = new HashMap<String,String>();
@@ -36,84 +38,9 @@ public class Sales {
 		BufferedReader branchbuffer = null;
 		BufferedReader commoditybuffer = null;
 
-
-
-
-
-		if (!branchfile.exists() || !branchfile.canRead() ){
-			System.out.println("支店定義ファイルが存在しません");
-			return;
-		}
-		try{
-			branchbuffer = new BufferedReader(new FileReader(branchfile));
-
-			String s;
-
-			while( (s = branchbuffer.readLine() ) != null){
-				//System.out.println (s + "を読み込みました");
-				String[] data = s.split(",");
-
-				if(!data[0].matches("^[0-9]{3}$") || data.length !=2) {
-					System.out.println("支店定義ファイルのフォーマットが不正です");
-					return;
-				}
-				branchNameMap.put(data[0], data[1]);
-				branchSaleMap.put(data[0], 0L);
-
-
-			}
-		}catch(IOException e){
-			System.out.println(error);
-			return;
-		}finally{
-			if(branchbuffer !=null){
-				try{
-					branchbuffer.close();
-				}catch(IOException e){
-					System.out.println(error);
-					return;
-				}
-			}
-		}
-
-		if (!commodityfile.exists() || !commodityfile.canRead() ){
-			System.out.println("商品定義ファイルが存在しません");
-			return;
-		}
-		try{
-			commoditybuffer = new BufferedReader(new FileReader(commodityfile));
-
-			String s;
-
-			while((s=commoditybuffer.readLine())!=null){
-				//System.out.println(s+"を読み込みました");
-				String[] data = s.split(",");
-
-
-				if(!data[0].matches("\\w{8}") || data.length !=2){
-					System.out.println("商品定義ファイルのフォーマットが不正です");
-					return;
-				}
-				commoNameMap.put(data[0], data[1]);
-				commoSaleMap.put(data[0], 0L);
-			}
-
-		}catch(IOException e){
-			System.out.println(error);
-			return;
-		}finally{
-			if(commoditybuffer !=null){
-				try{
-					commoditybuffer.close();
-				}catch(IOException e){
-					System.out.println(error);
-					return;
-				}
-			}
-		}
-
-
-		//String[] filelist = rcdfile.list();
+		reader(branchfile , branchbuffer , branchNameMap , branchSaleMap ,"^[0-9]{3}$" ,"支店");
+		reader(commodityfile , commoditybuffer , commoNameMap , commoSaleMap , "\\w{8}" , "商品");
+		
 		File[] filecheck = rcdfile.listFiles();
 		ArrayList <Integer> rcdlist = new ArrayList <Integer>();
 		ArrayList <String> rcdlist1 = new ArrayList <String>();
@@ -125,17 +52,13 @@ public class Sales {
 			}
 		}
 
-
 		if(rcdlist.size() != rcdlist.get(rcdlist.size()-1) - rcdlist.get(0) + 1){
 			System.out.println("売上ファイル名が連番になっていません");
 			return;
 		}
 
 		BufferedReader br = null;
-		BufferedWriter bw = null;
-		BufferedWriter bw2 = null;
 
-		//集計部門
 		try{
 			for(int i=0; i < rcdlist1.size(); i++){
 				File file = new File (args[0], rcdlist1.get(i) );
@@ -155,7 +78,6 @@ public class Sales {
 					System.out.println(error);
 					return;
 				}
-				//	System.out.println(rcdRead);
 
 				if (! branchSaleMap.containsKey (rcdRead.get(0)) ){
 					System.out.println(file.getName() + "の支店コードが不正です");
@@ -190,69 +112,78 @@ public class Sales {
 				}
 			}
 		}
-		//System.out.println(branchSaleMap);
+		
+		writer(branchSaleMap , branchNameMap , file2);
+		writer(commoSaleMap , commoNameMap , file3);	
+	}
 
-		//ソート部門
+	static void reader(File file , BufferedReader br , Map<String , String> namemap , Map<String , Long> salemap , String st , String str){
+		String error="予期せぬエラーが発生しました";
+		if (!file.exists() || !file.canRead() ){
+			System.out.println(str+"定義ファイルが存在しません");
+			System.exit(0);
+		}
 		try{
-			List<Map.Entry <String,Long> > entries =
-					new ArrayList <Map.Entry <String,Long> > (branchSaleMap.entrySet() );
-			Collections.sort(entries, new Comparator<Map.Entry <String,Long> >() {
-				public int compare(
-						Entry <String,Long> entry1, Entry <String,Long> entry2) {
-					return ((Long)entry2.getValue() ).compareTo((Long)entry1.getValue() );
+			br = new BufferedReader(new FileReader(file));
+
+			String s;
+
+			while( (s = br.readLine() ) != null){
+				String[] data = s.split(",");
+
+				if(!data[0].matches(st) || data.length !=2) {
+					System.out.println(str+"定義ファイルのフォーマットが不正です");
+					System.exit(0);
 				}
-			});
-			File file2 = new File (args[0],  File.separator + "branch.out");
-			bw = new BufferedWriter(new FileWriter(file2) );
-			for (Entry <String,Long> s : entries) {
-				bw.write(s.getKey() + "," + branchNameMap.get(s.getKey() ) + "," + s.getValue() + System.getProperty("line.separator") );
-
-				//System.out.println("s.getKey() : " + s.getKey());
-				//System.out.println("s.getValue() : " + s.getValue());
+				namemap.put(data[0], data[1]);
+				salemap.put(data[0], 0L);
 			}
-
 		}catch(IOException e){
 			System.out.println(error);
-			return;
+			System.exit(0);
 		}finally{
-			if(bw !=null){
-				try{bw.close();
+			if(br !=null){
+				try{
+					br.close();
 				}catch(IOException e){
 					System.out.println(error);
-					return;
+					System.exit(0);
 				}
 			}
 		}
-
+	}
+	
+	static void writer(Map<String,Long> salemap , Map<String,String> namemap , File file){
+		BufferedWriter bw2 = null;
+		String error="予期せぬエラーが発生しました";
 		try{
 			List <Map.Entry <String,Long> > entries2 =
-					new ArrayList <Map.Entry <String,Long> > (commoSaleMap.entrySet() );
+					new ArrayList <Map.Entry <String,Long> > (salemap.entrySet() );
 			Collections.sort(entries2, new Comparator<Map.Entry <String,Long> > () {
 				public int compare(
 						Entry <String,Long> entry1, Entry <String,Long> entry2) {
 					return ((Long)entry2.getValue() ).compareTo((Long)entry1.getValue() );
 				}
 			});
-			File file3 = new File (args[0], File.separator + "commodity.out");
-			bw2 = new BufferedWriter ( new FileWriter(file3) );
+			bw2 = new BufferedWriter ( new FileWriter(file) );
 			for (Entry <String,Long> s:entries2) {
 
-				bw2.write(s.getKey() + "," + commoNameMap.get(s.getKey() ) + "," + s.getValue() + System.getProperty("line.separator") );
-				//System.out.println("s.getKey() : " + s.getKey());
-				//System.out.println("s.getValue() : " + s.getValue());
+				bw2.write(s.getKey() + "," + namemap.get(s.getKey() ) + "," + s.getValue() + System.getProperty("line.separator") );
+				
 			}
 
 		}catch(IOException e){
 			System.out.println(error);
-			return;
+			System.exit(0);
 		}finally{
 			if(bw2 !=null){
 				try{bw2.close();
 				}catch(IOException e){
 					System.out.println(error);
-					return;
+					System.exit(0);
 				}
 			}
+
 		}
 	}
 }
