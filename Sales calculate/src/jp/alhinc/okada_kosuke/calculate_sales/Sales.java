@@ -132,7 +132,6 @@ public class Sales {
 
 		try{
 			br = new BufferedReader(new FileReader(file));
-
 			String s;
 
 			while( (s = br.readLine() ) != null){
@@ -145,7 +144,6 @@ public class Sales {
 				namemap.put(data[0], data[1]);
 				salemap.put(data[0], 0L);
 			}
-			return true;
 		}catch(IOException e){
 			System.out.println(error);
 			return false;
@@ -158,16 +156,15 @@ public class Sales {
 					return false;
 				}
 			}
-		}
-
+		}return true;
 	}
 
-	static boolean writer(Map<String,Long> salemap , Map<String,String> namemap , File file){
+	static boolean writer(Map<String,Long> saleMap , Map<String,String> nameMap , File file){
 		BufferedWriter bw2 = null;
 		String error="予期せぬエラーが発生しました";
 		try{
 			List <Map.Entry <String,Long> > entries2 =
-					new ArrayList <Map.Entry <String,Long> > (salemap.entrySet() );
+					new ArrayList <Map.Entry <String,Long> > (saleMap.entrySet() );
 			Collections.sort(entries2, new Comparator<Map.Entry <String,Long> > () {
 				public int compare(
 						Entry <String,Long> entry1, Entry <String,Long> entry2) {
@@ -177,10 +174,8 @@ public class Sales {
 			bw2 = new BufferedWriter ( new FileWriter(file) );
 			for (Entry <String,Long> s:entries2) {
 
-				bw2.write(s.getKey() + "," + namemap.get(s.getKey() ) + "," + s.getValue() + System.getProperty("line.separator") );
-
+				bw2.write(s.getKey() + "," + nameMap.get(s.getKey() ) + "," + s.getValue() + System.getProperty("line.separator") );
 			}
-			return true;
 		}catch(IOException e){
 			System.out.println(error);
 			return false;
@@ -192,7 +187,6 @@ public class Sales {
 					return false;
 				}
 			}
-
-		}
+		}return true;
 	}
 }
